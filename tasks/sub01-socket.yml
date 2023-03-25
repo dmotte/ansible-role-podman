@@ -1,0 +1,21 @@
+---
+- name: Detect the user the tasks will run as
+  ansible.builtin.command:
+    cmd: id -u
+  changed_when: false
+  register: user_id
+
+- name: Configure the Podman socket
+  ansible.builtin.systemd:
+    name: podman.socket
+    scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
+    enabled: "{{ podman_socket }}"
+    masked: "{{ not podman_socket }}"
+    state: "{{ 'started' if podman_socket else 'stopped' }}"
+
+- name: Ensure the Podman static service is stopped
+  ansible.builtin.systemd:
+    name: podman.service
+    scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
+    state: stopped
+  when: not podman_socket

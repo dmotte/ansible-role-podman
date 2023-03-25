@@ -1,0 +1,11 @@
+---
+# Whether or not to enable the Podman socket
+podman_socket: false
+
+# Event expression for the podman-auto-update timer. If set to empty string, the
+# podman-auto-update timer will be disabled
+pau_event_expr: ""
+
+# List of users to configure the Podman stuff for. Supported attributes for each
+# entry: name (mandatory), podman_socket, pau_event_expr
+podman_users: []

@@ -1,0 +1,70 @@
+---
+- name: Podman installation
+  block:
+    - name: Execute apt update if the last one is more than 1 hour ago
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_pkg_mgr == "apt"
+
+    - name: Install Podman
+      ansible.builtin.package:
+        name: podman
+
+- name: Podman basic configuration
+  block:
+    - name: Disable the podman-auto-update service at boot
+      ansible.builtin.systemd:
+        name: podman-auto-update.service
+        enabled: false
+
+    - name: Create the podman-auto-update user unit files if they don't exist
+      ansible.builtin.copy:
+        src: /usr/lib/systemd/system/{{ item }}
+        dest: /usr/lib/systemd/user/{{ item }}
+        remote_src: true
+        force: false
+        mode: "0644"
+      loop: [podman-auto-update.service, podman-auto-update.timer]
+      register: pau_user_unit_files
+
+    - name: Issue systemctl --user daemon-reload to pick up config changes
+      become_user: "{{ item }}"
+      ansible.builtin.systemd:
+        daemon_reload: true
+        scope: user
+      loop: "{{ podman_users | map(attribute='name') }}"
+      when: pau_user_unit_files is changed # noqa: no-handler
+
+    - name: User scope - start the D-Bus socket
+      # To fix https://github.com/containers/podman/issues/12983 immediately, without rebooting
+      become_user: "{{ item }}"
+      ansible.builtin.systemd:
+        name: dbus.socket
+        scope: user
+        state: started
+      loop: "{{ podman_users | map(attribute='name') }}"
+
+- name: System scope - Podman socket configuration
+  ansible.builtin.include_tasks:
+    file: sub01-socket.yml
+
+- name: System scope - podman-auto-update configuration
+  ansible.builtin.include_tasks:
+    file: sub02-pau.yml
+
+- name: User scope - Podman socket configuration
+  vars:
+    ansible_become_user: "{{ item.name }}"
+    podman_socket: "{{ item.podman_socket | default(false) }}"
+  ansible.builtin.include_tasks:
+    file: sub01-socket.yml
+  loop: "{{ podman_users }}"
+
+- name: User scope - podman-auto-update configuration
+  vars:
+    ansible_become_user: "{{ item.name }}"
+    pau_event_expr: "{{ item.pau_event_expr | default('') }}"
+  ansible.builtin.include_tasks:
+    file: sub02-pau.yml
+  loop: "{{ podman_users }}"
