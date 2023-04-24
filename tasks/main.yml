@@ -69,3 +69,9 @@
   ansible.builtin.include_tasks:
     file: sub02-pau.yml
   loop: "{{ podman_users }}"
+
+- name: Set lowest unprivileged port in sysctl
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "{{ ip_unprivileged_port_start | string }}"
+  when: ip_unprivileged_port_start > 0

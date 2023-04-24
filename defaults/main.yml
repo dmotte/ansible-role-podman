@@ -6,6 +6,9 @@ podman_socket: false
 # podman-auto-update timer will be disabled
 pau_event_expr: ""
 
+# Set lowest unprivileged IP port in sysctl. If <= 0, it won't be changed
+ip_unprivileged_port_start: -1
+
 # List of users to configure the Podman stuff for. Supported attributes for each
 # entry: name (mandatory), podman_socket, pau_event_expr
 podman_users: []
