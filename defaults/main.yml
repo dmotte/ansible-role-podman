@@ -6,6 +6,12 @@ podman_socket: false
 # podman-auto-update timer will be disabled
 pau_event_expr: ""
 
+# Extra arguments for the podman-kube@ system service
+pk_system_extra_args: ""
+
+# Extra arguments for the podman-kube@ user service
+pk_user_extra_args: ""
+
 # Set lowest unprivileged IP port in sysctl. If <= 0, it won't be changed
 ip_unprivileged_port_start: -1
 

@@ -79,6 +79,18 @@
   when: item.set_linger is defined
   loop: "{{ podman_users }}"
 
+- name: Set extra arguments for podman-kube@ services
+  vars:
+    systemd_scope: "{{ outer_item.systemd_scope }}"
+    extra_args: "{{ outer_item.extra_args }}"
+  ansible.builtin.include_tasks:
+    file: sub04-pk-extra-args.yml
+  when: outer_item.extra_args != ""
+  loop:
+    - { systemd_scope: system, extra_args: "{{ pk_system_extra_args }}" }
+    - { systemd_scope: user, extra_args: "{{ pk_user_extra_args }}" }
+  loop_control: { loop_var: outer_item }
+
 - name: Set lowest unprivileged port in sysctl
   ansible.posix.sysctl:
     name: net.ipv4.ip_unprivileged_port_start
