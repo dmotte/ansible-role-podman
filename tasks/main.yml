@@ -19,6 +19,7 @@
         enabled: false
 
     - name: Create the podman-auto-update user unit files if they don't exist
+      # Because they don't ship with Podman 3
       ansible.builtin.copy:
         src: /usr/lib/systemd/system/{{ item }}
         dest: /usr/lib/systemd/user/{{ item }}
