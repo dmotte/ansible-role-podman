@@ -11,6 +11,17 @@
       ansible.builtin.package:
         name: podman
 
+- name: Set linger for podman_users
+  # Linger may need to be enabled before using systemctl as one of the
+  # podman_users. See https://access.redhat.com/discussions/6029491
+  vars:
+    user_name: "{{ item.name }}"
+    set_linger: "{{ item.set_linger }}"
+  ansible.builtin.include_tasks:
+    file: sub01-linger.yml
+  when: item.set_linger is defined
+  loop: "{{ podman_users }}"
+
 - name: Podman basic configuration
   block:
     - name: Disable the podman-auto-update service at boot
@@ -48,18 +59,18 @@
 
 - name: System scope - Podman socket configuration
   ansible.builtin.include_tasks:
-    file: sub01-socket.yml
+    file: sub02-socket.yml
 
 - name: System scope - podman-auto-update configuration
   ansible.builtin.include_tasks:
-    file: sub02-pau.yml
+    file: sub03-pau.yml
 
 - name: User scope - Podman socket configuration
   vars:
     ansible_become_user: "{{ item.name }}"
     podman_socket: "{{ item.podman_socket | default(false) }}"
   ansible.builtin.include_tasks:
-    file: sub01-socket.yml
+    file: sub02-socket.yml
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-auto-update configuration
@@ -67,16 +78,7 @@
     ansible_become_user: "{{ item.name }}"
     pau_event_expr: "{{ item.pau_event_expr | default('') }}"
   ansible.builtin.include_tasks:
-    file: sub02-pau.yml
-  loop: "{{ podman_users }}"
-
-- name: Set linger for podman_users
-  vars:
-    user_name: "{{ item.name }}"
-    set_linger: "{{ item.set_linger }}"
-  ansible.builtin.include_tasks:
-    file: sub03-linger.yml
-  when: item.set_linger is defined
+    file: sub03-pau.yml
   loop: "{{ podman_users }}"
 
 - name: Set extra arguments for podman-kube@ services
