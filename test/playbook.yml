@@ -14,3 +14,4 @@
           - name: "{{ ansible_user }}"
             podman_socket: true
             pau_event_expr: Tue 02:00
+            set_linger: true

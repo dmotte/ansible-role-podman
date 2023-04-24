@@ -70,6 +70,15 @@
     file: sub02-pau.yml
   loop: "{{ podman_users }}"
 
+- name: Set linger for podman_users
+  vars:
+    user_name: "{{ item.name }}"
+    set_linger: "{{ item.set_linger }}"
+  ansible.builtin.include_tasks:
+    file: sub03-linger.yml
+  when: item.set_linger is defined
+  loop: "{{ podman_users }}"
+
 - name: Set lowest unprivileged port in sysctl
   ansible.posix.sysctl:
     name: net.ipv4.ip_unprivileged_port_start
