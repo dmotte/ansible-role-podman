@@ -20,6 +20,16 @@ _Podman_ will be installed using the official `podman` package from the _Debian_
 
 See [`defaults/main.yml`](defaults/main.yml).
 
+## Useful commands
+
+Once you have set up Podman on your host using this Ansible role, you may find the following commands useful to manage your services:
+
+- `sudo XDG_RUNTIME_DIR=/run/user/1001 -iu myuser`
+- `podman ps -ap`
+- `systemctl --user status podman-kube@$(systemd-escape ~/kube.yaml)`
+- `journalctl --user -u podman-kube@$(systemd-escape ~/kube.yaml)`
+- `ls -la ~/.local/share/containers/storage/volumes`
+
 ## Development
 
 If you want to contribute to this project, you can use the [`test/playbook.yml`](test/playbook.yml) file to test the role while editing it.
