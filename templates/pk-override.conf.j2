@@ -1,3 +1,4 @@
 [Service]
+# The empty "ExecStart=" line is needed to reset the default value
 ExecStart=
 {{ execstart_line | replace('%I', extra_args ~ ' %I') }}
