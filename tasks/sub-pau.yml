@@ -31,13 +31,13 @@
           {{ '/etc/systemd/system' if user_id.stdout == '0'
           else '~/.config/systemd/user' }}/podman-auto-update.timer.d/override.conf
         mode: "0644"
-      register: pau_timer_file
+      register: override_file
 
     - name: Issue systemctl daemon-reload to pick up config changes
       ansible.builtin.systemd:
         daemon_reload: true
         scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
-      when: pau_timer_file is changed # noqa: no-handler
+      when: override_file is changed # noqa: no-handler
 
     - name: Enable the podman-auto-update timer
       ansible.builtin.systemd:
@@ -50,11 +50,11 @@
         name: podman-auto-update.timer
         scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
         state: started
-      when: pau_timer_file is not changed
+      when: override_file is not changed
 
     - name: Restart the podman-auto-update timer (if config is changed)
       ansible.builtin.systemd:
         name: podman-auto-update.timer
         scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
         state: restarted
-      when: pau_timer_file is changed # noqa: no-handler
+      when: override_file is changed # noqa: no-handler
