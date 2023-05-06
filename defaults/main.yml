@@ -6,15 +6,14 @@ podman_socket: false
 # string, the podman-auto-update timer will be disabled
 pau_event_expr: ""
 
-# Extra arguments for the podman-kube@ system service
-pk_system_extra_args: ""
-
-# Extra arguments for the podman-kube@ user service
-pk_user_extra_args: ""
+# Extra arguments for the podman-kube@ system service. If set to empty string,
+# no extra args will be set
+pk_extra_args: ""
 
 # Set lowest unprivileged IP port in sysctl. If <= 0, it won't be changed
 ip_unprivileged_port_start: -1
 
 # List of users to configure the Podman stuff for. Supported attributes for each
-# entry: name (mandatory), set_linger, podman_socket, pau_event_expr
+# entry: name (mandatory), set_linger, podman_socket, pau_event_expr,
+# pk_extra_args
 podman_users: []

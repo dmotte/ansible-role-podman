@@ -1,34 +1,42 @@
 ---
-- name: Grep ExecStart line from the podman-kube@.service file
-  ansible.builtin.command:
-    cmd: grep -i '^ExecStart=' /usr/lib/systemd/{{ systemd_scope }}/podman-kube@.service
-  changed_when: false
-  register: grep_execstart
+- name: Set extra arguments for the podman-kube@ service
+  when: pk_extra_args != ""
+  block:
+    - name: Detect the user the tasks will run as
+      ansible.builtin.command:
+        cmd: id -u
+      changed_when: false
+      register: user_id
 
-- name: Ensure the podman-kube@.service.d directory exists and with the right permissions
-  ansible.builtin.file:
-    path: /etc/systemd/{{ systemd_scope }}/podman-kube@.service.d
-    state: directory
-    mode: "0755"
+    - name: Grep ExecStart line from the podman-kube@.service file
+      ansible.builtin.command:
+        cmd: >
+          grep -i '^ExecStart=' /usr/lib/systemd/{{ 'system' if
+          user_id.stdout == '0' else 'user' }}/podman-kube@.service
+      changed_when: false
+      register: grep_execstart
 
-- name: Create the podman-kube@.service.d/override.conf file
-  vars:
-    execstart_line: "{{ grep_execstart.stdout }}"
-  ansible.builtin.template:
-    src: pk-override.conf.j2
-    dest: /etc/systemd/{{ systemd_scope }}/podman-kube@.service.d/override.conf
-    mode: "0644"
-  register: override_file
+    - name: Ensure the podman-kube@.service.d directory exists and with the right permissions
+      ansible.builtin.file:
+        path: >-
+          {{ '/etc/systemd/system' if user_id.stdout == '0'
+          else '~/.config/systemd/user' }}/podman-kube@.service.d
+        state: directory
+        mode: "0755"
 
-- name: Issue systemctl daemon-reload to pick up config changes
-  ansible.builtin.systemd:
-    daemon_reload: true
-  when: systemd_scope == "system" and override_file is changed
+    - name: Create the podman-kube@.service.d/override.conf file
+      vars:
+        execstart_line: "{{ grep_execstart.stdout }}"
+      ansible.builtin.template:
+        src: pk-override.conf.j2
+        dest: >-
+          {{ '/etc/systemd/system' if user_id.stdout == '0'
+          else '~/.config/systemd/user' }}/podman-kube@.service.d/override.conf
+        mode: "0644"
+      register: override_file
 
-- name: Issue systemctl --user daemon-reload to pick up config changes
-  become_user: "{{ item }}"
-  ansible.builtin.systemd:
-    daemon_reload: true
-    scope: user
-  loop: "{{ podman_users | map(attribute='name') }}"
-  when: systemd_scope == "user" and override_file is changed
+    - name: Issue systemctl daemon-reload to pick up config changes
+      ansible.builtin.systemd:
+        daemon_reload: true
+        scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
+      when: override_file is changed # noqa: no-handler

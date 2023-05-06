@@ -65,6 +65,10 @@
   ansible.builtin.include_tasks:
     file: sub-pau.yml
 
+- name: System scope - podman-kube@ extra args
+  ansible.builtin.include_tasks:
+    file: sub-pk-extra-args.yml
+
 - name: User scope - Podman socket configuration
   vars:
     ansible_become_user: "{{ item.name }}"
@@ -81,17 +85,13 @@
     file: sub-pau.yml
   loop: "{{ podman_users }}"
 
-- name: Set extra arguments for podman-kube@ services
+- name: User scope - podman-kube@ extra args
   vars:
-    systemd_scope: "{{ outer_item.systemd_scope }}"
-    extra_args: "{{ outer_item.extra_args }}"
+    ansible_become_user: "{{ item.name }}"
+    pk_extra_args: "{{ item.pk_extra_args | default('') }}"
   ansible.builtin.include_tasks:
     file: sub-pk-extra-args.yml
-  when: outer_item.extra_args != ""
-  loop:
-    - { systemd_scope: system, extra_args: "{{ pk_system_extra_args }}" }
-    - { systemd_scope: user, extra_args: "{{ pk_user_extra_args }}" }
-  loop_control: { loop_var: outer_item }
+  loop: "{{ podman_users }}"
 
 - name: Set lowest unprivileged port in sysctl
   ansible.posix.sysctl:
