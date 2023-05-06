@@ -18,7 +18,7 @@
     user_name: "{{ item.name }}"
     set_linger: "{{ item.set_linger }}"
   ansible.builtin.include_tasks:
-    file: sub01-linger.yml
+    file: sub-linger.yml
   when: item.set_linger is defined
   loop: "{{ podman_users }}"
 
@@ -59,18 +59,18 @@
 
 - name: System scope - Podman socket configuration
   ansible.builtin.include_tasks:
-    file: sub02-socket.yml
+    file: sub-socket.yml
 
 - name: System scope - podman-auto-update configuration
   ansible.builtin.include_tasks:
-    file: sub03-pau.yml
+    file: sub-pau.yml
 
 - name: User scope - Podman socket configuration
   vars:
     ansible_become_user: "{{ item.name }}"
     podman_socket: "{{ item.podman_socket | default(false) }}"
   ansible.builtin.include_tasks:
-    file: sub02-socket.yml
+    file: sub-socket.yml
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-auto-update configuration
@@ -78,7 +78,7 @@
     ansible_become_user: "{{ item.name }}"
     pau_event_expr: "{{ item.pau_event_expr | default('') }}"
   ansible.builtin.include_tasks:
-    file: sub03-pau.yml
+    file: sub-pau.yml
   loop: "{{ podman_users }}"
 
 - name: Set extra arguments for podman-kube@ services
@@ -86,7 +86,7 @@
     systemd_scope: "{{ outer_item.systemd_scope }}"
     extra_args: "{{ outer_item.extra_args }}"
   ansible.builtin.include_tasks:
-    file: sub04-pk-extra-args.yml
+    file: sub-pk-extra-args.yml
   when: outer_item.extra_args != ""
   loop:
     - { systemd_scope: system, extra_args: "{{ pk_system_extra_args }}" }
