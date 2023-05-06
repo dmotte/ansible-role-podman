@@ -13,6 +13,9 @@ pk_extra_args: ""
 # Set lowest unprivileged IP port in sysctl. If <= 0, it won't be changed
 ip_unprivileged_port_start: -1
 
+# Only perform user-related tasks. This assumes that Podman is already installed
+only_users: false
+
 # List of users to configure the Podman stuff for. Supported attributes for each
 # entry: name (mandatory), set_linger, podman_socket, pau_event_expr,
 # pk_extra_args
