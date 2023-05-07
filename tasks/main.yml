@@ -18,8 +18,7 @@
   vars:
     user_name: "{{ item.name }}"
     set_linger: "{{ item.set_linger }}"
-  ansible.builtin.include_tasks:
-    file: sub-linger.yml
+  ansible.builtin.include_tasks: { file: sub-linger.yml }
   when: item.set_linger is defined
   loop: "{{ podman_users }}"
 
@@ -60,42 +59,36 @@
   loop: "{{ podman_users | map(attribute='name') }}"
 
 - name: System scope - Podman socket configuration
-  ansible.builtin.include_tasks:
-    file: sub-socket.yml
+  ansible.builtin.include_tasks: { file: sub-socket.yml }
   when: not only_users
 
 - name: System scope - podman-auto-update configuration
-  ansible.builtin.include_tasks:
-    file: sub-pau.yml
+  ansible.builtin.include_tasks: { file: sub-pau.yml }
   when: not only_users
 
 - name: System scope - podman-kube@ extra args
-  ansible.builtin.include_tasks:
-    file: sub-pk-extra-args.yml
+  ansible.builtin.include_tasks: { file: sub-pk-extra-args.yml }
   when: not only_users
 
 - name: User scope - Podman socket configuration
   vars:
     ansible_become_user: "{{ item.name }}"
     podman_socket: "{{ item.podman_socket | default(false) }}"
-  ansible.builtin.include_tasks:
-    file: sub-socket.yml
+  ansible.builtin.include_tasks: { file: sub-socket.yml }
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-auto-update configuration
   vars:
     ansible_become_user: "{{ item.name }}"
     pau_event_expr: "{{ item.pau_event_expr | default('') }}"
-  ansible.builtin.include_tasks:
-    file: sub-pau.yml
+  ansible.builtin.include_tasks: { file: sub-pau.yml }
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-kube@ extra args
   vars:
     ansible_become_user: "{{ item.name }}"
     pk_extra_args: "{{ item.pk_extra_args | default('') }}"
-  ansible.builtin.include_tasks:
-    file: sub-pk-extra-args.yml
+  ansible.builtin.include_tasks: { file: sub-pk-extra-args.yml }
   loop: "{{ podman_users }}"
 
 - name: Set lowest unprivileged port in sysctl
