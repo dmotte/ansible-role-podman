@@ -16,7 +16,7 @@
   # Linger may need to be enabled before using systemctl as one of the
   # podman_users. See https://access.redhat.com/discussions/6029491
   vars:
-    user_name: "{{ item.name }}"
+    podman_user_name: "{{ item.name }}"
     set_linger: "{{ item.set_linger }}"
   ansible.builtin.include_tasks: { file: sub-linger.yml }
   when: item.set_linger is defined

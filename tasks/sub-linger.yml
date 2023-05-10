@@ -1,17 +1,17 @@
 ---
 - name: Check current linger status
   ansible.builtin.stat:
-    path: /var/lib/systemd/linger/{{ user_name }}
+    path: /var/lib/systemd/linger/{{ podman_user_name }}
   register: linger_file
 
 - name: Enable linger
   ansible.builtin.command:
-    cmd: loginctl enable-linger {{ user_name }}
+    cmd: loginctl enable-linger {{ podman_user_name }}
   changed_when: true
   when: not linger_file.stat.exists and set_linger
 
 - name: Disable linger
   ansible.builtin.command:
-    cmd: loginctl disable-linger {{ user_name }}
+    cmd: loginctl disable-linger {{ podman_user_name }}
   changed_when: true
   when: linger_file.stat.exists and not set_linger
