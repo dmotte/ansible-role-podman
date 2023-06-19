@@ -5,7 +5,7 @@
 
 Ansible role to install **Podman** on Debian hosts.
 
-This role has been tested with **Debian 11** (_bullseye_).
+This role has been tested with **Debian 12** (_bookworm_).
 
 _Podman_ will be installed using the official `podman` package from the _Debian_ repositories. In addition, this role allows you to configure some other related stuff, such as the **Podman socket** and the `podman-auto-update` service, both for the **system scope** and for **individual users**.
 
