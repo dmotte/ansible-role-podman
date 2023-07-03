@@ -22,13 +22,9 @@ See [`defaults/main.yml`](defaults/main.yml).
 
 ## Useful commands
 
-Once you have set up Podman on your host using this Ansible role, you may find the following commands useful to manage your services:
+Once you have set up Podman on your host using this Ansible role, see the following link for some useful commands to manage your services:
 
-- `sudo XDG_RUNTIME_DIR=/run/user/1001 -iu myuser`
-- `podman ps -ap`
-- `systemctl --user status podman-kube@$(systemd-escape ~/kube.yaml)`
-- `journalctl --user -u podman-kube@$(systemd-escape ~/kube.yaml)`
-- `ls -la ~/.local/share/containers/storage/volumes`
+https://github.com/dmotte/utils/tree/main/useful-commands#podman
 
 ## Development
 
