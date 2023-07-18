@@ -8,9 +8,19 @@
         cache_valid_time: 3600
       when: ansible_pkg_mgr == "apt"
 
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - acl # Needed by the "become_user" Ansible directive
+
     - name: Install Podman
       ansible.builtin.package:
         name: podman
+
+    - name: Install podman-compose
+      ansible.builtin.package:
+        name: podman-compose
+      when: podman_compose
 
 - name: Set linger for podman_users
   # Linger may need to be enabled before using systemctl as one of the

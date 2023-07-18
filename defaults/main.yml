@@ -1,4 +1,7 @@
 ---
+# Whether or not to install podman-compose
+podman_compose: false
+
 # Whether or not to enable the Podman system socket
 podman_socket: false
 
