@@ -1,6 +1,6 @@
 ---
 - name: Podman installation
-  when: not only_users
+  when: not podman_only_users
   block:
     - name: Execute apt update if the last one is more than 1 hour ago
       ansible.builtin.apt:
@@ -33,7 +33,7 @@
   loop: "{{ podman_users }}"
 
 - name: Podman basic configuration
-  when: not only_users
+  when: not podman_only_users
   block:
     - name: Disable the podman-auto-update service at boot
       ansible.builtin.systemd:
@@ -70,39 +70,39 @@
 
 - name: System scope - Podman socket configuration
   ansible.builtin.include_tasks: { file: sub-socket.yml }
-  when: not only_users
+  when: not podman_only_users
 
 - name: System scope - podman-auto-update configuration
   ansible.builtin.include_tasks: { file: sub-pau.yml }
-  when: not only_users
+  when: not podman_only_users
 
 - name: System scope - podman-kube@ extra args
   ansible.builtin.include_tasks: { file: sub-pk-extra-args.yml }
-  when: not only_users
+  when: not podman_only_users
 
 - name: User scope - Podman socket configuration
   vars:
     ansible_become_user: "{{ item.name }}"
-    podman_socket: "{{ item.podman_socket | default(false) }}"
+    podman_socket: "{{ item.socket | default(false) }}"
   ansible.builtin.include_tasks: { file: sub-socket.yml }
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-auto-update configuration
   vars:
     ansible_become_user: "{{ item.name }}"
-    pau_event_expr: "{{ item.pau_event_expr | default('') }}"
+    podman_auto_update_event_expr: "{{ item.auto_update_event_expr | default('') }}"
   ansible.builtin.include_tasks: { file: sub-pau.yml }
   loop: "{{ podman_users }}"
 
 - name: User scope - podman-kube@ extra args
   vars:
     ansible_become_user: "{{ item.name }}"
-    pk_extra_args: "{{ item.pk_extra_args | default('') }}"
+    podman_kube_extra_args: "{{ item.kube_extra_args | default('') }}"
   ansible.builtin.include_tasks: { file: sub-pk-extra-args.yml }
   loop: "{{ podman_users }}"
 
 - name: Set lowest unprivileged port in sysctl
   ansible.posix.sysctl:
     name: net.ipv4.ip_unprivileged_port_start
-    value: "{{ ip_unprivileged_port_start | string }}"
-  when: not only_users and ip_unprivileged_port_start > 0
+    value: "{{ podman_ip_unprivileged_port_start | string }}"
+  when: not podman_only_users and podman_ip_unprivileged_port_start > 0

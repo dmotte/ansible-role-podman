@@ -1,6 +1,6 @@
 ---
 - name: Set extra arguments for the podman-kube@ service
-  when: pk_extra_args != ""
+  when: podman_kube_extra_args != ""
   block:
     - name: Detect the user the tasks will run as
       ansible.builtin.command:

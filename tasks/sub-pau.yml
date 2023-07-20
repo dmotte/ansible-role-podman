@@ -11,10 +11,10 @@
     scope: "{{ omit if user_id.stdout == '0' else 'user' }}"
     enabled: false
     state: stopped
-  when: pau_event_expr == ""
+  when: podman_auto_update_event_expr == ""
 
 - name: Set up the podman-auto-update timer
-  when: pau_event_expr != ""
+  when: podman_auto_update_event_expr != ""
   block:
     - name: Ensure the podman-auto-update.timer.d directory exists and with the right permissions
       ansible.builtin.file:
