@@ -24,7 +24,7 @@ See [`defaults/main.yml`](defaults/main.yml).
 
 Once you have set up Podman on your host using this Ansible role, see the following link for some useful commands to manage your services:
 
-https://github.com/dmotte/misc/tree/main/useful-commands#podman
+https://github.com/dmotte/misc/tree/main/snippets#shell-snippets-for-podman
 
 ## Development
 
