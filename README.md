@@ -3,6 +3,12 @@
 [![GitHub latest release](https://img.shields.io/github/v/release/dmotte/ansible-role-podman?logo=github&style=flat-square)](https://github.com/dmotte/ansible-role-podman/actions)
 [![Ansible Galaxy](https://img.shields.io/badge/galaxy-dmotte.podman-blueviolet?logo=ansible&style=flat-square)](https://galaxy.ansible.com/dmotte/podman)
 
+## :warning: Warning: this project is **no longer maintained** :warning:
+
+I decided to convert the Ansible code [to Bash](https://github.com/dmotte/misc/tree/main/scripts) for simplicity.
+
+---
+
 Ansible role to install **Podman** on Debian hosts.
 
 This role has been tested with **Debian 12** (_bookworm_).
